@@ -131,9 +131,10 @@ def cli():
     if jpg_counter > 0:
         transfer(jpg_transfers, skipped_jpg, ext=JPG_EXT)
 
-    logfile = write_skipped(skipped_raw, skipped_jpg)
+    if (len(skipped_jpg) > 0) or (len(skipped_raw) > 0):
+        logfile = write_skipped(skipped_raw, skipped_jpg)
+        
     console.print(f"Skipped existing {len(skipped_raw)} ORF and {len(skipped_jpg)} JPG files, details in {logfile}")
 
 if __name__ == "__main__":
     cli()
-    
