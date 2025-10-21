@@ -43,10 +43,10 @@ def check_drive(path:Path, console:Console, kind:str):
     kind_full = {"src":"Source", "dst":"Destination"}
     
     if path.exists():
-        console.print(f"{kind_full[kind]} {path} OK")
+        console.print(f"{kind_full[kind]} {path} [bold green]OK")
         return True
     else:
-        console.print(f"{kind_full[kind]} {path} missing!")
+        console.print(f"{kind_full[kind]} {path} [bold red]missing!")
         return False
     
 
