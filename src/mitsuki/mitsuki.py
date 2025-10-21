@@ -107,9 +107,9 @@ def cli():
         status.update("Finding JPG files...")
         for item in jpg_files:
             created = item.stat().st_mtime  # last modified time
-            created_dt = dt.fromtimestamp(created, tz=timezone.utc)  # convert to utc datetime
-            image_folder = ImageFolder(created_dt)
-            folder_dict[created_dt.date()] = image_folder
+            dt_created = dt.fromtimestamp(created, tz=timezone.utc)  # convert to utc datetime
+            image_folder = ImageFolder(dt_created)
+            folder_dict[dt_created.date()] = image_folder
             jpg_transfers[item] = image_folder.jpg
         
         jpg_counter = len(jpg_transfers)
@@ -118,8 +118,8 @@ def cli():
         status.update("Finding RAW files...")
         for item in raw_files:
             created = item.stat().st_mtime
-            created_dt = dt.fromtimestamp(created, tz=timezone.utc)
-            image_folder = folder_dict[created_dt.date()]
+            date_created = dt.fromtimestamp(created, tz=timezone.utc).date()
+            image_folder = folder_dict[date_created]
             raw_transfers[item] = image_folder.raw
     
         raw_counter = len(raw_transfers)
