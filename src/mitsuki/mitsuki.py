@@ -123,15 +123,22 @@ def cli():
         status.console.print(f"Found {raw_counter} {RAW_EXT} files")
 
     # actual transfer
-    if raw_counter > 0:
-        transfer(raw_transfers, skipped_raw, ext=RAW_EXT)
     if jpg_counter > 0:
         transfer(jpg_transfers, skipped_jpg, ext=JPG_EXT)
+    else:
+        console.print(f"No {JPG_EXT} transfers")
 
+    if raw_counter > 0:
+        transfer(raw_transfers, skipped_raw, ext=RAW_EXT)
+    else:
+        console.print(f"No {RAW_EXT} transfers")
+
+    console.print("[bold green]Transfers complete!")
     if (len(skipped_jpg) > 0) or (len(skipped_raw) > 0):
         logfile = write_skipped(skipped_raw, skipped_jpg)
-        
-    console.print(f"Skipped existing {len(skipped_raw)} ORF and {len(skipped_jpg)} JPG files, details in {logfile}")
+        console.print(f"Skipped existing {len(skipped_raw)} ORF and {len(skipped_jpg)} JPG files, details in {logfile}")
+    else:
+        console.print("No transfers skipped")
 
 if __name__ == "__main__":
     cli()
