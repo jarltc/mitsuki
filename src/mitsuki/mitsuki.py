@@ -50,7 +50,7 @@ def check_drive(path:Path, console:Console, kind:str):
         return False
     
 
-def transfer(transfer_list:dict, skipped:list, ext:str):
+def transfer(transfer_list:dict, skipped:list, ext:str, console:Console):
     """Transfer files from src to dst found in transfer_list.
     transfer_list is a dict of Paths to images in the source directory paired with their associated ImageFolders,
     i.e. Path(SDCard/DCIM/image): ImageFolder.jpg or ImageFolder.raw
@@ -68,7 +68,12 @@ def transfer(transfer_list:dict, skipped:list, ext:str):
             sleep(0.2)
         else:
             dst = output_folder/(source_item.name)  # .name includes the extension
-            copy(source_item, dst)
+            try:
+                copy(source_item, dst)
+            except Exception:
+                console.print(f"[bold red]Problem encountered when transferring {source_item.name}")
+                console.print_exception()
+                
     
 def cli():
     console = Console()
@@ -124,12 +129,12 @@ def cli():
 
     # actual transfer
     if jpg_counter > 0:
-        transfer(jpg_transfers, skipped_jpg, ext=JPG_EXT)
+        transfer(jpg_transfers, skipped_jpg, ext=JPG_EXT, console=console)
     else:
         console.print(f"No {JPG_EXT} transfers")
 
     if raw_counter > 0:
-        transfer(raw_transfers, skipped_raw, ext=RAW_EXT)
+        transfer(raw_transfers, skipped_raw, ext=RAW_EXT, console=console)
     else:
         console.print(f"No {RAW_EXT} transfers")
 
