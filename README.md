@@ -6,4 +6,4 @@ Ex.: folder > 2025 > 250630 > RAW/JPG
 
 I recommended to clear the SD card after each transfer so the algorithm doesn't get needlessly heavy; it could still use some optimization at the moment.
 
-![alt text](https://github.com/jarltc/imagesort/blob/master/assets/example.png?raw=true)
+![alt text](https://github.com/jarltc/mitsuki/blob/master/assets/example.png?raw=true)
