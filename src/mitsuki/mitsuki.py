@@ -27,7 +27,9 @@ class ImageFolder:
     def __init__(self, date:dt) -> None:
         self.date = date
         self.folder_name = dt.strftime(self.date, DATE_FORMAT)
-        self.year = str(self.date.year)
+        self.year = self.date.strftime("%Y")
+        self.month = self.date.strftime("%B")
+        self.day = self.date.strftime("%d")
 
         self.basedir = BACKUP_DIR
         self.folder = Path(BACKUP_DIR, self.year, self.folder_name)  # backup_dir/2025/250630/...
