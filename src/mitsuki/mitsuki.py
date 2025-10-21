@@ -63,15 +63,12 @@ def transfer(transfer_list:dict, skipped:list, ext:str):
 
     # loop through dictionary of Path(SDCard/DCIM/image): ImageFolder.jpg/raw
     desc = f"Transferring {ext}..."
-    for item, image_folder in track(transfer_list.items(), description=desc):
+    for source_item, output_folder in track(transfer_list.items(), description=desc):
         if DRY_RUN:
             sleep(0.2)
         else:
-            dst = image_folder/(item.name)  # .name includes the extension
-            if not dst.exists():
-                copy(item, dst)
-            else:
-                skipped.append(item.stem)
+            dst = output_folder/(source_item.name)  # .name includes the extension
+            copy(source_item, dst)
     
 def cli():
     console = Console()
