@@ -111,8 +111,11 @@ def cli():
             created = item.stat().st_mtime  # last modified time
             dt_created = dt.fromtimestamp(created, tz=timezone.utc)  # convert to utc datetime
             image_folder = ImageFolder(dt_created)
-            folder_dict[dt_created.date()] = image_folder
-            jpg_transfers[item] = image_folder.jpg
+            if (image_folder.jpg/item.name).exists():
+                skipped_jpg.append(item.stem)
+            else: 
+                folder_dict[dt_created.date()] = image_folder
+                jpg_transfers[item] = image_folder.jpg
         
         jpg_counter = len(jpg_transfers)
         status.console.print(f"Found {jpg_counter} {JPG_EXT} files")
@@ -122,7 +125,11 @@ def cli():
             created = item.stat().st_mtime
             date_created = dt.fromtimestamp(created, tz=timezone.utc).date()
             image_folder = folder_dict[date_created]
-            raw_transfers[item] = image_folder.raw
+            if (image_folder.raw/item.name).exists():
+                skipped_jpg.append(item.stem)
+            else: 
+                folder_dict[dt_created.date()] = image_folder
+                raw_transfers[item] = image_folder.raw
     
         raw_counter = len(raw_transfers)
         status.console.print(f"Found {raw_counter} {RAW_EXT} files")
