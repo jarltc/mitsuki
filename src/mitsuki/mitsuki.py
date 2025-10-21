@@ -102,9 +102,9 @@ def cli():
     jpg_files = Path(SDCARD).rglob("*"+JPG_EXT, case_sensitive=False)
 
     # create ImageFolder instances
-    with console.status("[bold green]Locating images...") as status:
+    with console.status("[bold blue]Locating images...") as status:
         # I'm doing JPG first because it's more likely to have JPGs with no associated RAW files
-        status.update("Finding JPG files...")
+        status.update("[bold green]Scanning JPG files...")
         for item in jpg_files:
             created = item.stat().st_mtime  # last modified time
             dt_created = dt.fromtimestamp(created, tz=timezone.utc)  # convert to utc datetime
@@ -115,7 +115,7 @@ def cli():
         jpg_counter = len(jpg_transfers)
         status.console.print(f"Found {jpg_counter} {JPG_EXT} files")
         
-        status.update("Finding RAW files...")
+        status.update("[bold green]Scanning RAW files...")
         for item in raw_files:
             created = item.stat().st_mtime
             date_created = dt.fromtimestamp(created, tz=timezone.utc).date()
@@ -136,3 +136,4 @@ def cli():
 
 if __name__ == "__main__":
     cli()
+    
