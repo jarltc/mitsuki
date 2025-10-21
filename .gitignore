@@ -1,0 +1,11 @@
+*
+!src/
+!src/mitsuki/
+!src/mitsuki/mitsuki.py
+!src/mitsuki/utils.py
+!README.md
+!assets/
+!assets/example.png
+!.gitignore
+!pyproject.toml
+!LICENSE
