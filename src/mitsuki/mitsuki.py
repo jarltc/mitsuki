@@ -43,14 +43,14 @@ def check_drive(path:Path, console:Console, kind:str):
     kind_full = {"src":"Source", "dst":"Destination"}
     
     if path.exists():
-        console.print(f"{kind_full[kind]} {path} OK")
+        console.print(f"{kind_full[kind]} {path} [bold green]OK")
         return True
     else:
-        console.print(f"{kind_full[kind]} {path} missing!")
+        console.print(f"{kind_full[kind]} {path} [bold red]missing!")
         return False
     
 
-def transfer(transfer_list:dict, skipped:list, ext:str):
+def transfer(transfer_list:dict, skipped:list, ext:str, console:Console):
     """Transfer files from src to dst found in transfer_list.
     transfer_list is a dict of Paths to images in the source directory paired with their associated ImageFolders,
     i.e. Path(SDCard/DCIM/image): ImageFolder.jpg or ImageFolder.raw
@@ -63,15 +63,17 @@ def transfer(transfer_list:dict, skipped:list, ext:str):
 
     # loop through dictionary of Path(SDCard/DCIM/image): ImageFolder.jpg/raw
     desc = f"Transferring {ext}..."
-    for item, image_folder in track(transfer_list.items(), description=desc):
+    for source_item, output_folder in track(transfer_list.items(), description=desc):
         if DRY_RUN:
             sleep(0.2)
         else:
-            dst = image_folder/(item.name)  # .name includes the extension
-            if not dst.exists():
-                copy(item, dst)
-            else:
-                skipped.append(item.stem)
+            dst = output_folder/(source_item.name)  # .name includes the extension
+            try:
+                copy(source_item, dst)
+            except Exception:
+                console.print(f"[bold red]Problem encountered when transferring {source_item.name}")
+                console.print_exception()
+                
     
 def cli():
     console = Console()
@@ -87,6 +89,9 @@ def cli():
     if not (sdcardOK and backupOK):
         console.print("[bold red]ERROR: One or both of the required drives is missing. Exiting program.")
         sys.exit()
+
+    if DRY_RUN:
+        console.print("[bold yellow]WARNING: running in dry run mode!")
     
     # record all generated ImageFolder instances and associate them with a datetime
     folder_dict = {}
@@ -109,8 +114,11 @@ def cli():
             created = item.stat().st_mtime  # last modified time
             dt_created = dt.fromtimestamp(created, tz=timezone.utc)  # convert to utc datetime
             image_folder = ImageFolder(dt_created)
-            folder_dict[dt_created.date()] = image_folder
-            jpg_transfers[item] = image_folder.jpg
+            if (image_folder.jpg/item.name).exists():
+                skipped_jpg.append(item.stem)
+            else: 
+                folder_dict[dt_created.date()] = image_folder
+                jpg_transfers[item] = image_folder.jpg
         
         jpg_counter = len(jpg_transfers)
         status.console.print(f"Found {jpg_counter} {JPG_EXT} files")
@@ -118,23 +126,38 @@ def cli():
         status.update("[bold green]Scanning RAW files...")
         for item in raw_files:
             created = item.stat().st_mtime
-            date_created = dt.fromtimestamp(created, tz=timezone.utc).date()
-            image_folder = folder_dict[date_created]
-            raw_transfers[item] = image_folder.raw
+            date_created = dt.fromtimestamp(created, tz=timezone.utc)
+            try:  # to extract the ImageFolder if in the dictionary
+                image_folder = folder_dict[date_created.date()]
+            except(KeyError):
+                image_folder = ImageFolder(date_created)
+            if (image_folder.raw/item.name).exists():
+                skipped_jpg.append(item.stem)
+            else: 
+                folder_dict[dt_created.date()] = image_folder
+                raw_transfers[item] = image_folder.raw
     
         raw_counter = len(raw_transfers)
         status.console.print(f"Found {raw_counter} {RAW_EXT} files")
 
     # actual transfer
-    if raw_counter > 0:
-        transfer(raw_transfers, skipped_raw, ext=RAW_EXT)
     if jpg_counter > 0:
-        transfer(jpg_transfers, skipped_jpg, ext=JPG_EXT)
+        transfer(jpg_transfers, skipped_jpg, ext=JPG_EXT, console=console)
+    else:
+        console.print(f"No {JPG_EXT} transfers")
 
+    if raw_counter > 0:
+        transfer(raw_transfers, skipped_raw, ext=RAW_EXT, console=console)
+    else:
+        console.print(f"No {RAW_EXT} transfers")
+
+    
+    skip_msg = "No transfers skipped."
     if (len(skipped_jpg) > 0) or (len(skipped_raw) > 0):
         logfile = write_skipped(skipped_raw, skipped_jpg)
-        
-    console.print(f"Skipped existing {len(skipped_raw)} ORF and {len(skipped_jpg)} JPG files, details in {logfile}")
+        skip_msg = f"Skipped existing {len(skipped_raw)} ORF and {len(skipped_jpg)} JPG files, details in {logfile}"
+
+    console.print("[bold green]Transfers complete![/] " + skip_msg)
 
 if __name__ == "__main__":
     cli()
