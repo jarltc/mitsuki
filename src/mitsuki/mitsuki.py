@@ -89,6 +89,9 @@ def cli():
     if not (sdcardOK and backupOK):
         console.print("[bold red]ERROR: One or both of the required drives is missing. Exiting program.")
         sys.exit()
+
+    if DRY_RUN:
+        console.print("[bold yellow]WARNING: running in dry run mode!")
     
     # record all generated ImageFolder instances and associate them with a datetime
     folder_dict = {}
