@@ -148,12 +148,13 @@ def cli():
     else:
         console.print(f"No {RAW_EXT} transfers")
 
-    console.print("[bold green]Transfers complete!")
+    
+    skip_msg = "No transfers skipped."
     if (len(skipped_jpg) > 0) or (len(skipped_raw) > 0):
         logfile = write_skipped(skipped_raw, skipped_jpg)
-        console.print(f"Skipped existing {len(skipped_raw)} ORF and {len(skipped_jpg)} JPG files, details in {logfile}")
-    else:
-        console.print("No transfers skipped")
+        skip_msg = f"Skipped existing {len(skipped_raw)} ORF and {len(skipped_jpg)} JPG files, details in {logfile}"
+
+    console.print("[bold green]Transfers complete![/] " + skip_msg)
 
 if __name__ == "__main__":
     cli()
