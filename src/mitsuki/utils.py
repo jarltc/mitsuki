@@ -13,7 +13,7 @@ def load_config() -> dict:
     return config
 
 def write_skipped(raw:list, jpg:list):
-    fname = dt.now().strftime("%y%m%d-%H%M%S")
+    fname = dt.now().strftime("%y%m%d-%H%M")
     logfile = mitsuki_dir/"logs"/f"{fname}.txt"
     logfile.parent.mkdir(parents=True, exist_ok=True)
     lines = [
