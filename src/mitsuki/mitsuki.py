@@ -126,8 +126,11 @@ def cli():
         status.update("[bold green]Scanning RAW files...")
         for item in raw_files:
             created = item.stat().st_mtime
-            date_created = dt.fromtimestamp(created, tz=timezone.utc).date()
-            image_folder = folder_dict[date_created]
+            date_created = dt.fromtimestamp(created, tz=timezone.utc)
+            try:  # to extract the ImageFolder if in the dictionary
+                image_folder = folder_dict[date_created.date()]
+            except(KeyError):
+                image_folder = ImageFolder(date_created)
             if (image_folder.raw/item.name).exists():
                 skipped_jpg.append(item.stem)
             else: 
